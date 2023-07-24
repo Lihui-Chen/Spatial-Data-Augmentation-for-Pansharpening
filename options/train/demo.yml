@@ -1,0 +1,163 @@
+mode: train
+gpu_ids: [0]
+scale: 4 #todo
+run_range: 1
+mask_training: mask_collate_fn_arbrpn # mask_collate_fn_arbrpn is used for ArbRPN series only. Other network please use None.
+
+
+datasets    : # args for datasets.
+    train_GF1   : # A demo for one training set
+        LRdim       : 4 # numbers of channel for MS images in the dataset
+        REFdim      : 1 # numbers of channel for PAN images in the dataset
+        batch_size  : 1 # numbers of mini-batch size for training
+        data_root   : ../dataset/NBU_GF1_410samples/train # the root of the dataset set.
+        setmode     : LRHR # type of dataset including, LRHR, LRHRRAM
+        data_type   : .npy # the format of samples in the dataset
+        get_MTF     : true # if get MTF in dataset or not
+        img_range   : 2047 # radiometric resolution of the dataset
+        is_degrade  : true # if adopt the random anisotropic MTF for data augmentation or not
+        scale_change: true # if adopt the random GSD rescaling for data augmentation or not
+        scale_delta : 0.2 # the ratio to adopt random GSD rescaling
+        high_thre   : 1.0 # the upper bound of the GSD rescaling
+        low_thre    : 0.5 # the lower bound of the GSD rescaling
+        is_srf      : false # if use random SRF for data augmentation or not
+        n_workers   : 4 # numbers of workers to load dataset
+        name        : train_GF1 # name of the dataset
+        noise       : . # if add noise to the input image or not
+        patch_size  : 16 # LRMS size for training
+        phase       : train
+        repeat      : 3
+        run_range   : 1
+        scaledict   : #  scale ratio between LR and GT/REF.
+            GT          : 4
+            LR          : 1
+            REF         : 4
+        use_flip    : true # if use flip for data augmentation or not
+        use_rot     : true # if use flip for data augmentation or not
+        
+    train_QB    : #
+        setmode     : LRHRRAM
+        data_type   : .npy
+        data_root   : ../dataset/NBU_QB_500samples/train
+        is_degrade  : true
+        scaledict   : 
+            LR          : 1
+            REF         : 4
+            GT          : 4
+            
+        img_range   : 2047
+        LRdim       : 4
+        REFdim      : 1
+        n_workers   : 4
+        repeat      : 3
+        batch_size  : 8   #todo: 
+        patch_size  : 16
+        use_flip    : true
+        use_rot     : true
+        noise       : .
+
+    train_WV2: #todo train datasets
+        setmode: LRHRRAM
+        data_type: .npy
+        data_root: ../dataset/NBU_WV2_500samples/train
+        is_degrade: true
+        scaledict:
+            LR: 1
+            REF: 4
+            GT: 4
+        img_range: 2047
+        LRdim: 4
+        REFdim: 1
+        n_workers: 4
+        repeat: 3
+        batch_size: 8   #todo:
+        patch_size: 16
+        use_flip: true
+        use_rot: true
+        noise: .
+      
+    
+
+    valid_QB: #todo validation datasets
+        setmode: LRHRRAM
+        data_type: .npy
+        data_root: ../dataset/NBU_QB_500samples/valid
+        is_degrade: True
+        get_MTF: True
+        img_range: 2047
+        scaledict:
+            LR: 1
+            REF: 4
+            GT: 4
+        LRdim: 4
+        REFdim: 1
+        batch_size: 8
+        n_workers: 4 
+        noise: .
+
+    valid_WV2: #todo validation datasets
+        setmode: LRHRRAM
+        data_type: .npy
+        data_root: ../dataset/NBU_WV2_500samples/valid
+        is_degrade: True
+        get_MTF: True
+        img_range: 2047
+        scaledict:
+            LR: 1
+            REF: 4
+            GT: 4
+        LRdim: 4
+        REFdim: 1
+        batch_size: 8
+        n_workers: 4
+        noise: .
+
+    valid_GF1: #todo validation datasets
+        setmode: LRHRRAM
+        data_type: .npy
+        data_root: ../dataset/NBU_GF1_410samples/valid
+        is_degrade: True
+        get_MTF: True
+        img_range: 1023
+        scaledict:
+            LR: 1
+            REF: 4
+            GT: 4
+        LRdim: 4
+        REFdim: 1
+        batch_size: 8
+        n_workers: 4 
+        noise: .
+        
+## hyper-parameters for network architecture
+networks:
+    net_arch: linear_transformer # this v alue must be same with the filename of 'your_network_name'.py
+    num_res: 3
+    num_cycle: 2
+    int_type: null
+    use_dynamic: true
+    temper_step: 80
+    norm_type: null
+    scope: img
+    # learning_rate: 0.0002
+
+# the setting for optimizer, loss function, learning_strategy, etc.
+solver:
+    loss_name: selfloss
+    optimType: ADAM
+    learning_rate: 0.0002
+    lr_scheme: warm_up # warm_up or multisteplr
+    warmUpEpoch: 0 # for warm_up
+    lrStepSize: 200 # for multisteplr
+    weight_decay: null #todo: 0.0001
+    acuSteps: 1 #todo:
+    manual_seed: 0
+    num_epochs: 3
+    save_ckp_step: 1000
+    pretrain: null
+    pretrained_path: null
+
+logger : 
+    name   : 
+    tags   : [MixGQW, Norm2047] #ablation, Hyper
+    log_dir: Ablation_study_QBFIX/

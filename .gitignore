@@ -1,0 +1,26 @@
+exp_tblog/
+experiments/
+models/
+results/
+result/
+data/img_dir
+
+.idea/
+.vscode/
+__pycache__/
+.ipynb_checkpoints/
+
+*.sln
+*.suo
+*.pyproj
+*.pyc
+*.png
+*.prof
+*.pdf
+# *.yml
+*.npy
+*.mat
+*.zip
+apex_total/
+apex/
+*.log
